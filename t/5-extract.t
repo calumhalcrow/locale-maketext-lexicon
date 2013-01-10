@@ -1108,15 +1108,15 @@ SKIP: {
         %a{:href=>"#"}= "[+] " . l('[_1] plus [_1] equals [_2].', 'two', 'five')
 __EXAMPLE__
 #. ('two', 'five')
-#: :1
+#: :15
 msgid "%1 plus %1 equals %2."
 msgstr ""
 
-#: :1
+#: :13
 msgid "About"
 msgstr ""
 
-#: :1
+#: :11
 msgid "Home"
 msgstr ""
 __EXPECTED__

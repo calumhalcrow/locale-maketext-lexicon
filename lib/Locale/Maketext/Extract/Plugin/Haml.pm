@@ -3,7 +3,7 @@ package Locale::Maketext::Extract::Plugin::Haml;
 use strict;
 use warnings;
 use base qw(Locale::Maketext::Extract::Plugin::Base);
-use Text::Haml;
+use Text::Haml 0.990108;
 use Locale::Maketext::Extract::Plugin::Perl;
 
 =head1 NAME
@@ -55,16 +55,26 @@ sub extract {
 
     # Checking for expr and text allows us to recognise
     # the types of HTML entries we are interested in.
-    my @texts =
-      map { $_->{text} } grep { $_->{expr} and $_->{text} } @{ $haml->tape };
+    my %texts =
+      map { $_->{text} => $_->{lineno} }
+      grep { $_->{expr} and $_->{text} } @{ $haml->tape };
 
-    my $perl = Locale::Maketext::Extract::Plugin::Perl->new;
+    while ( my ( $text, $lineno ) = each %texts ) {
+        my $perl = Locale::Maketext::Extract::Plugin::Perl->new;
 
-    # Calling extract on our strings will cause
-    # EPPerl to store our entries internally.
-    map { $perl->extract($_) } @texts;
+        # Calling extract on our strings will cause
+        # EPPerl to store our entries internally.
+        $perl->extract($text);
 
-    map { $self->add_entry( @{$_} ) } @{ $perl->entries };
+        foreach my $entry ( @{ $perl->entries } ) {
+
+            # Replace the line number found by EPPerl
+            # by the one given by Text::Haml.
+            $entry->[1] = $lineno;
+
+            $self->add_entry( @{$entry} );
+        }
+    }
 }
 
 =head1 SEE ALSO
